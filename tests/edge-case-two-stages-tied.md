@@ -1,19 +1,20 @@
-# Test — Edge case: two stages look broken + low spend noise
+# Test: Edge case, two stages moving at once
 
-**Scenario:** Two stages are soft at once, and the account is small enough that noise matters. The skill must pick ONE bottleneck (the more upstream one) and flag the volume caveat.
+**Scenario:** Two stages look worse at the same time, but one rests on a small, immature sample. The skill must weigh the evidence behind each rate and cohort maturity, not apply an "upstream wins" tie-break or a spend-based reliability rule.
 
 ## Input
 
-"$12K/mo spend, last 30 days: LP CVR dropped from 6% to 3.8%, and close rate dropped from 25% to 15%. Which do we fix?"
+"$12K/mo spend, last 30 days: LP CVR dropped from 6% to 3.8% (about 2,000 clicks). Close rate dropped from 25% to 15% (3 closes from 20 held calls). Our sales cycle is about 3 weeks. We swapped in a new landing page three weeks ago. Which do we fix?"
 
 ## Expected behavior
 
-- Picks **one** bottleneck: Stage 2 (LP CVR) — the more upstream of the two, because upstream fixes compound and the downstream drop is partly fed by it (a looser lead mix closing worse is expected when CVR/lead quality shifts).
-- Explicitly explains the tie-break rule rather than silently choosing.
-- Flags the volume caveat: at $12K/mo and 30 days, close-rate math is running on a handful of deals — the 25%→15% "collapse" may be 2-3 deals of noise. Recommends a 90-day window for the close-rate read.
-- Fix list targets the LP (form, speed, message match), with close rate as the *monitor* metric, not a second simultaneous fix.
+- **LP CVR** is the supported constraint: about 76 leads instead of roughly 120 on ~2,000 clicks, a material change that lines up with the page swap. Fix list targets the page (form, mobile rendering, message fit, what changed in the swap).
+- **Close rate** is reported with its count and maturity: 3 of 20 vs an expected 5, a two-deal difference, and most of those calls are younger than the 3-week cycle. Status: insufficient evidence. It isn't declared broken.
+- Says why the two might be linked (the new page may attract a different lead mix, which would lower close rate too) and names the observation that separates them: close rate on mature cohorts, split by old-page vs new-page leads.
+- Close rate becomes a monitoring item with a re-read date once the post-swap cohorts are older than 3 weeks.
 
 ## Pass criteria
-- Exactly one bottleneck named, with the upstream tie-break stated.
-- The small-sample warning appears (sub-$25K/mo → longer windows).
-- No dual-front fix plan; the second stage becomes a monitoring item.
+- One stage is named because the evidence supports it, not because of an upstream tie-break rule.
+- The close-rate change is shown with its event count and cohort maturity.
+- No "under $25K/mo is unreliable" spend rule.
+- The second stage gets a specific re-read condition, not a second simultaneous fix.
